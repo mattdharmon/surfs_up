@@ -70,7 +70,7 @@ measurement %>%
         kable()
 ```
 
-### Temperature for each station and month.
+### Temperature for each elevation and month.
 ```{r, echo = FALSE, message = FALSE}
 merged_data %>%
         select(c(date, tobs, station, elevation)) %>%
@@ -92,7 +92,7 @@ merged_data %>%
         geom_boxplot()
 ```
 
-### Average Rain for each station and month.
+### Average Rain for each elevation and month.
 
 ```{r, echo = FALSE, message = FALSE}
 merged_data %>%
@@ -118,7 +118,7 @@ merged_data %>%
 ```
 
 # Summary
-The temperatures between June and December are roughly the same, however December seems to a wider range of temperatures.
+The temperatures between June and December are roughly the same, however December seems to have a wider range of temperatures.
 
 The amount of rain is greater in December as well.
 

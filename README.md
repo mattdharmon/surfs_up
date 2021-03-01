@@ -212,18 +212,18 @@ june
 </tbody>
 </table>
 
-### Temperature for each station and month.
+### Temperature for each elevation and month.
 
 ![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-### Average Rain for each station and month.
+### Average Rain for each elevation and month.
 
 ![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 # Summary
 
 The temperatures between June and December are roughly the same, however
-December seems to a wider range of temperatures.
+December seems to have a wider range of temperatures.
 
 The amount of rain is greater in December as well.
 
