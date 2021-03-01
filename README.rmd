@@ -1,0 +1,125 @@
+---
+title: "Surfs Up"
+output: github_document
+---
+
+```{r, include=FALSE}
+library(DBI)
+library(RSQLite)
+library('tidyverse')
+library('dplyr')
+library('magrittr')
+library('ggplot2')
+library(viridis)
+library(hrbrthemes)
+library('lubridate')
+library('kableExtra')
+con<- dbConnect(SQLite(), "hawaii.sqlite")
+measurement<-dbReadTable(con, 'measurement')
+station<-dbReadTable(con, 'station')
+
+measurement %>%
+  merge(station, by='station')->merged_data
+dbDisconnect(con)
+```
+# Overview
+W. Avy likes your analysis, but he wants more information about temperature trends before opening the surf shop. Specifically, he wants temperature data for the months of June and December in Oahu, in order to determine if the surf and ice cream shop business is sustainable year-round.
+
+# Results
+### Temperature difference between June and December
+```{r, echo = FALSE, message = FALSE}
+measurement %>%
+        select(c(date, tobs)) %>%
+        filter(month(date) == 6 | month(date) == 12) %>%
+        mutate("month" = ifelse(month(date) == 6, 'june', 'december')) %>%
+        mutate("year" = year(date)) %>%
+        group_by(month) %>%
+        summarise(
+                count = n(),
+                std = sd(tobs),
+                mean = mean(tobs),
+                "25%" = quantile(tobs, 0.25),
+                "50%" = quantile(tobs, 0.50),
+                "75%" = quantile(tobs, 0.75),
+                "min" = min(tobs),
+                "max" = max(tobs)
+        ) %>%
+        kable()
+```
+### Average Rain for June and December
+```{r, echo = FALSE, message = FALSE}
+measurement %>%
+        select(c(date, prcp)) %>%
+        filter(month(date) == 6 | month(date) == 12) %>%
+        drop_na(prcp) %>%
+        filter(prcp > 0) %>%
+        mutate("month" = ifelse(month(date) == 6, 'june', 'december')) %>%
+        mutate("year" = year(date)) %>%
+        group_by(month) %>%
+        summarise(
+                count = n(),
+                std = sd(prcp),
+                mean = mean(prcp),
+                "25%" = quantile(prcp, 0.25),
+                "50%" = quantile(prcp, 0.50),
+                "75%" = quantile(prcp, 0.75),
+                "min" = min(prcp),
+                "max" = max(prcp),
+                "total rain" = sum(prcp)
+        ) %>%
+        kable()
+```
+
+### Temperature for each station and month.
+```{r, echo = FALSE, message = FALSE}
+merged_data %>%
+        select(c(date, tobs, station, elevation)) %>%
+        filter(month(date) == 6 | month(date) == 12) %>%
+        mutate("month" = ifelse(month(date) == 6, 'june', 'december')) %>%
+        mutate("year" = year(date)) %>%
+        group_by(elevation, month) %>%
+        summarise(
+                count = n(),
+                std = sd(tobs),
+                mean = mean(tobs),
+                "25%" = quantile(tobs, 0.25),
+                "50%" = quantile(tobs, 0.50),
+                "75%" = quantile(tobs, 0.75),
+                "min" = min(tobs),
+                "max" = max(tobs)
+        ) %>%
+        ggplot(aes(x=elevation, y=mean, fill = month)) +
+        geom_boxplot()
+```
+
+### Average Rain for each station and month.
+
+```{r, echo = FALSE, message = FALSE}
+merged_data %>%
+        select(c(date, prcp, elevation)) %>%
+        filter(month(date) == 6 | month(date) == 12) %>%
+        drop_na(prcp) %>%
+        filter(prcp > 0) %>%
+        mutate("month" = ifelse(month(date) == 6, 'june', 'december')) %>%
+        mutate("year" = year(date)) %>%
+        group_by(elevation, month) %>%
+        summarise(
+                count = n(),
+                std = sd(prcp),
+                mean = mean(prcp),
+                "25%" = quantile(prcp, 0.25),
+                "50%" = quantile(prcp, 0.50),
+                "75%" = quantile(prcp, 0.75),
+                "min" = min(prcp),
+                "max" = max(prcp)
+        ) %>%
+        ggplot(aes(x=elevation, y=mean, fill=month)) +
+        geom_boxplot()
+```
+
+# Summary
+The temperatures between June and December are roughly the same, however December seems to a wider range of temperatures.
+
+The amount of rain is greater in December as well.
+
+The higher the elevation the warmer it seems to get and have less rain as well.

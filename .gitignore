@@ -1,4 +1,7 @@
 config.py
+module_9.iml
+README.html
+.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
